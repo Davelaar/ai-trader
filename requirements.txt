@@ -1,0 +1,6 @@
+python-bitvavo-api==1.4.3
+redis==5.0.1
+orjson==3.9.10
+pyarrow==14.0.1
+pyyaml==6.0.1
+jsonschema==4.19.1

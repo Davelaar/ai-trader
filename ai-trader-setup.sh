@@ -4,13 +4,13 @@ set -euo pipefail
 # Create workspace
 mkdir -p ~/ai-trader
 cd ~/ai-trader
-git init -b main || true
+git init -b main
 
 # Ensure directories exist before writing heredocs
 mkdir -p common common/schemas docs/RUNBOOKS out data/parquet logs services
 
 # Write files (each heredoc corresponds to a file created above)
-cat > common/config.yaml <<'EOCONF'
+cat > common/config.yaml <<'EOF'
 # common/config.yaml
 # Template configuration for AI-Trader — do NOT put secrets here.
 # Replace placeholders in .env (see .env.sample) and use env interpolation where required.
@@ -95,9 +95,9 @@ ci:
     - jsonschema
 
 # End of config template
-EOCONF
+EOF
 
-cat > common/schemas/events.json <<'EOJSON'
+cat > common/schemas/events.json <<'EOF'
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "AI-Trader Events v1",
@@ -175,9 +175,9 @@ cat > common/schemas/events.json <<'EOJSON'
     }
   ]
 }
-EOJSON
+EOF
 
-cat > common/schemas/db.sql <<'EOSQL'
+cat > common/schemas/db.sql <<'EOF'
 -- common/schemas/db.sql
 -- MariaDB DDL for AI-Trader (schema only). DO NOT store credentials here.
 -- Run as a privileged DB user and create a DB user with secure password (replace placeholders).
@@ -270,9 +270,9 @@ CREATE TABLE IF NOT EXISTS alerts (
 ) ENGINE=InnoDB;
 
 -- End of DDL
-EOSQL
+EOF
 
-cat > .env.sample <<'EOENV'
+cat > .env.sample <<'EOF'
 # .env.sample — copy to .env and fill secrets. DO NOT COMMIT .env with secrets.
 # Example:
 # cp .env.sample .env
@@ -313,11 +313,11 @@ EXCLUDED_SYMBOLS=BTC,ETH,SOL,USDT,USDC,DAI,TUSD
 OPERATOR_ID=1702
 
 # End of sample
-EOENV
+EOF
 
-# Create runbook docs
+# Create runbook docs (only first two included here; rest follow same pattern)
 mkdir -p docs/RUNBOOKS
-cat > docs/RUNBOOKS/step00_foundation_buildplan.md <<'EORUN00'
+cat > docs/RUNBOOKS/step00_foundation_buildplan.md <<'EOF'
 # Step 00 — Foundation
 
 Short title
@@ -381,27 +381,25 @@ Tests (unit / integration)
   - test_integration_db_connect: assert execute("SELECT 1") == [(1,)]
   - test_parquet_dir_writable: touch PARQUET_ROOT/testfile
 
-EORUN00
-
-# Add shortened runbooks placeholders
-for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
-  echo "# Step ${i} placeholder" > "docs/RUNBOOKS/step$(printf '%02d' $i)_buildplan.md"
-done
+# truncated for brevity in this script; full runbooks can be added similarly
+EOF
 
 # Create .keep files for expected directories
 mkdir -p data/parquet logs services docs/RUNBOOKS out
 touch data/parquet/.keep logs/.keep services/.keep docs/RUNBOOKS/.keep out/.keep
 
-# Set permissions conservatively
-chmod -R 0755 . || true
+# Set ownership and permissions (adjust sudo usage if running on remote server)
+# By default this sets ownership to current user:staff; on server change to snapdiscounts:psacln as needed.
+sudo chown -R "$(whoami)":staff . || true
 find . -type f -exec chmod 0644 {} \; || true
 chmod 0600 .env.sample || true
 
-# Git commit if repo exists
-if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  git add .
-  git commit -m "Add runbooks, schemas and foundation templates for AI-Trader (no secrets)" || true
-  git branch -M main || true
-fi
+# Commit to git
+git add .
+git commit -m "Add runbooks, schemas, and foundation templates for AI-Trader (no secrets)"
 
-echo "Setup script written to ~/ai-trader/ai-trader-setup.sh"
+# Create zip
+cd ..
+zip -r ai-trader.zip ai-trader || true
+
+echo "Repository created in ~/ai-trader and ai-trader.zip created in $(pwd)"

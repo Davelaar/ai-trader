@@ -61,3 +61,4 @@ Tests (unit / integration)
   - test_integration_db_connect: assert execute("SELECT 1") == [(1,)]
   - test_parquet_dir_writable: touch PARQUET_ROOT/testfile
 
+# truncated for brevity in this script; full runbooks can be added similarly

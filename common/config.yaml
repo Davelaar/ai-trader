@@ -1,0 +1,84 @@
+# common/config.yaml
+# Template configuration for AI-Trader — do NOT put secrets here.
+# Replace placeholders in .env (see .env.sample) and use env interpolation where required.
+
+project:
+  name: ai-trader
+  root: /var/www/vhosts/snapdiscounts.nl/ai-trader
+  venv: /var/www/vhosts/snapdiscounts.nl/ai-trader/.venv
+  user: snapdiscounts
+  group: psacln
+  parquet_root: /var/www/vhosts/snapdiscounts.nl/ai-trader/data/parquet
+  logs_root: /var/www/vhosts/snapdiscounts.nl/ai-trader/logs
+
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+  streams:
+    ws_events_mini_ticker: ws_events:mini_ticker
+    ws_events_bbo: ws_events:bbo
+    ws_events_depth10: ws_events:depth10
+    selection_out: selection.out
+    features_out: features.out
+    order_cmds: order_cmds
+    risk_out: risk.out
+    exec_events: exec.events
+    fills_events: fills.events
+    alerts: alerts
+
+parquet:
+  layout: "date=YYYY-MM-DD/symbol=SYMBOL/"
+  required_tables:
+    - mini_ticker.parquet
+    - bbo.parquet
+    - depth10.parquet
+    - features.parquet
+
+exchange:
+  name: bitvavo
+  operator_id: 1702
+  sdk_package: python-bitvavo-api==1.4.3
+  min_notional_eur: 5.0
+  excluded_symbols:
+    - BTC
+    - ETH
+    - SOL
+    - USDT
+    - USDC
+    - DAI
+    - TUSD
+  canary_pairs:
+    - FART-EUR
+    - OPEN-EUR
+    - ADA-EUR
+
+risk:
+  total_exposure_pct: 100
+  per_symbol_exposure_pct: 25
+  day_kill_threshold_pct: -5
+  price_band_bps: 15
+  exploration_cap_pct: 25
+  liquidity_guards:
+    turnover_eur_60m_min: 25000
+    spread_bps_max: 20
+    trades_per_min_min: 5
+    depth_at_10bps_min_eur: 1000
+    completeness_pct_min: 95
+
+logging:
+  format: json
+  timestamp: utc_ms
+  rotate_max_bytes: 104857600  # 100MB
+  rotate_days: 7
+
+ci:
+  lint:
+    - black
+    - ruff
+    - mypy
+  test:
+    - pytest
+    - jsonschema
+
+# End of config template

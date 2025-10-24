@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI-Trader Events v1",
+  "type": "object",
+  "oneOf": [
+    {
+      "properties": {
+        "type": { "const": "mini_ticker" },
+        "ts": { "type": "integer" },
+        "symbol": { "type": "string" },
+        "price": { "type": "number" },
+        "volume": { "type": "number" },
+        "raw": { "type": "object" }
+      },
+      "required": ["type", "ts", "symbol", "price"]
+    },
+    {
+      "properties": {
+        "type": { "const": "bbo" },
+        "ts": { "type": "integer" },
+        "symbol": { "type": "string" },
+        "best_bid": { "type": "number" },
+        "best_ask": { "type": "number" },
+        "bid_size": { "type": "number" },
+        "ask_size": { "type": "number" },
+        "raw": { "type": "object" }
+      },
+      "required": ["type", "ts", "symbol", "best_bid", "best_ask"]
+    },
+    {
+      "properties": {
+        "type": { "const": "depth10" },
+        "ts": { "type": "integer" },
+        "symbol": { "type": "string" },
+        "bids": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "asks": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "raw": { "type": "object" }
+      },
+      "required": ["type", "ts", "symbol", "bids", "asks"]
+    },
+    {
+      "properties": {
+        "type": { "const": "selection" },
+        "ts": { "type": "integer" },
+        "symbols": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "metrics": { "type": "object" }
+      },
+      "required": ["type", "ts", "symbols"]
+    },
+    {
+      "properties": {
+        "type": { "const": "features" },
+        "ts": { "type": "integer" },
+        "symbol": { "type": "string" },
+        "features": { "type": "object" }
+      },
+      "required": ["type", "ts", "symbol", "features"]
+    }
+  ]
+}
